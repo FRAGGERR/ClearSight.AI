@@ -16,8 +16,8 @@ from pathlib import Path
 
 load_dotenv()
 
-EMAIL_ADDRESS = os.getenv('RESULTS_EMAIL')
-EMAIL_PASSWORD = os.getenv('RESULTS_EMAIL_PWD')
+EMAIL_ADDRESS = st.secrets["email"]["RESULTS_EMAIL"]
+EMAIL_PASSWORD = st.secrets["email"]["RESULTS_EMAIL_PWD"]
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
