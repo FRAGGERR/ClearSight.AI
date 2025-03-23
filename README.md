@@ -56,3 +56,94 @@
 ```bash
 git clone https://github.com/yourusername/clearsight.git
 cd clearsight
+Install Dependencies
+
+bash
+Copy
+pip install -r requirements.txt
+Run Application
+
+bash
+Copy
+streamlit run app.py
+🖥️ Usage
+1. Data Upload
+Drag & drop interface
+
+Sample datasets for quick exploration
+
+Real-time data validation
+
+2. Data Exploration
+python
+Copy
+# Example data preview
+df.head()
+df.describe()
+3. Visualization Workflow
+Select chart type from dropdown
+
+Choose X and Y axis variables
+
+Customize styling options
+
+Interact with live preview
+
+Export or save visualization
+
+4. Statistical Analysis
+Hypothesis testing
+
+Regression analysis
+
+ANOVA
+
+Time series decomposition
+
+🧠 Technical Stack
+Core Technologies:
+
+Python (Base language)
+
+Streamlit (Web framework)
+
+Pandas (Data manipulation)
+
+Plotly (Visualization)
+
+NumPy (Numerical computing)
+
+SciPy (Statistical analysis)
+
+Architecture:
+
+mermaid
+Copy
+graph TD
+    A[User Interface] --> B[Data Upload]
+    B --> C[Data Processing]
+    C --> D[Analysis Engine]
+    D --> E[Visualization Layer]
+    E --> F[Insight Export]
+🤝 Contributing
+We welcome contributions! Please follow these steps:
+
+Fork the repository
+
+Create your feature branch (git checkout -b feature/AmazingFeature)
+
+Commit your changes (git commit -m 'Add some AmazingFeature')
+
+Push to the branch (git push origin feature/AmazingFeature)
+
+Open a Pull Request
+
+📜 License
+Distributed under the MIT License. See LICENSE for more information.
+
+✉️ Contact
+Project Maintainer: Your Name
+Email: your.email@example.com
+GitHub: https://github.com/yourusername
+
+ClearSight is not just a tool - it's your data companion that transforms complex numbers into clear stories. Whether you're a business analyst looking for trends or a researcher validating hypotheses, ClearSight brings clarity to your data journey. ✨
