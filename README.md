@@ -10,6 +10,7 @@
 🌍 **Live Demo**: [clearsight.streamlit.app](https://clearsight.streamlit.app)
 
 ![ClearSight Dashboard Preview](https://via.placeholder.com/800x400.png?text=ClearSight+Dashboard+Preview)
+![Image](https://github.com/user-attachments/assets/54dded91-3cee-42fa-bfa1-38b66d108970)
 
 ## 🚀 Features
 
