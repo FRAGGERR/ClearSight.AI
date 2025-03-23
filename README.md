@@ -12,6 +12,8 @@
 ![Image](https://github.com/user-attachments/assets/54dded91-3cee-42fa-bfa1-38b66d108970)
 ![Image](https://github.com/user-attachments/assets/c78cac4b-ad72-4a79-8325-59b3bf9a5f81)
 ![Image](https://github.com/user-attachments/assets/401ba46a-f55e-45df-8777-93a7440fa3a3)
+![image](https://github.com/user-attachments/assets/0d99dc9b-046c-41cf-86d6-5e609e226841)
+
 ## 🚀 Features
 
 ### 📊 Comprehensive Data Analysis
