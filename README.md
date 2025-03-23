@@ -13,6 +13,9 @@
 ![Image](https://github.com/user-attachments/assets/c78cac4b-ad72-4a79-8325-59b3bf9a5f81)
 ![Image](https://github.com/user-attachments/assets/401ba46a-f55e-45df-8777-93a7440fa3a3)
 ![image](https://github.com/user-attachments/assets/0d99dc9b-046c-41cf-86d6-5e609e226841)
+![image](https://github.com/user-attachments/assets/b8849bdd-e7d1-4385-ba65-ef9b81cd2f26)
+<img width="1190" alt="Gmail - Diabetic Retinopathy Analysis - Hardik Chhipa_1" src="https://github.com/user-attachments/assets/dbd11f51-d02b-48ca-bc09-237ae122b7b5" />
+
 
 ## 🚀 Features
 
