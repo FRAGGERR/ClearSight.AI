@@ -1,9 +1,11 @@
 # 🔍 ClearSight - Data Analysis & Visualization Platform
 
 [![Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://clearsight.streamlit.app)
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Open Source](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
+![Keras](https://img.shields.io/badge/Keras-D00000?style=for-the-badge&logo=keras&logoColor=white)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)
 
 **ClearSight** is an intuitive web-based platform designed to empower users with seamless data analysis and visualization capabilities. Built with Streamlit, it transforms raw data into actionable insights through an interactive and user-friendly interface.
 
