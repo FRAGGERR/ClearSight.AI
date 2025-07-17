@@ -11,8 +11,10 @@ from PIL import Image, ImageColor, ImageOps
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from pathlib import Path
+
 
 load_dotenv()
 
@@ -39,7 +41,7 @@ def generate_html_report(data, stage_info):
     <body>
         <div class="header">
             <h1>ClearSight.AI Diabetic Retinopathy Report</h1>
-            <h3>{datetime.now().strftime('%Y-%m-%d %H:%M')}</h3>
+            <h3>{datetime.now(ZoneInfo("Asia/Kolkata")).strftime('%Y-%m-%d %H:%M')}</h3>
         </div>
 
         <div class="section">
@@ -95,7 +97,7 @@ def send_email(receiver_email, patient_name, diagnosis_data, stage_info):
     <body style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto;">
         <div style="background-color: {stage_info[1]}; padding: 20px; color: white; text-align: center;">
             <h1>ClearSight.AI Diabetic Retinopathy Report</h1>
-            <h3>{datetime.now().strftime('%Y-%m-%d %H:%M')}</h3>
+            <h3>{datetime.now(ZoneInfo("Asia/Kolkata")).strftime('%Y-%m-%d %H:%M')}</h3>
         </div>
 
         <div style="padding: 20px;">
@@ -159,7 +161,7 @@ def send_email(receiver_email, patient_name, diagnosis_data, stage_info):
     text_content = f"""Diabetic Retinopathy Analysis Report
 -----------------------------------------
 Patient: {patient_name}
-Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+Date: {datetime.now(ZoneInfo("Asia/Kolkata")).strftime('%Y-%m-%d %H:%M')}
 
 Diagnosis Summary:
 - Stage: {stage_info[0]}
