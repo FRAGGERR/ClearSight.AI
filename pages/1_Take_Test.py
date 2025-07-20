@@ -312,22 +312,6 @@ def download_model(file_id, output_path):
     else:
         print(f"Model already exists: {output_path}")
 
-# def load_models():
-#     # Load binary classification model (PyTorch)
-#     binary_model = models.densenet121(weights=None) #pretrained=False
-#     num_ftrs = binary_model.classifier.in_features
-#     binary_model.classifier = torch.nn.Linear(num_ftrs, 2)
-#     binary_model.load_state_dict(torch.load('saved_models/densenet121_retina_finetuned.pth', map_location=torch.device('cpu')))
-#     binary_model.eval()
-
-#     # Load DR stage model (TensorFlow)
-#     dr_model = tf.keras.models.load_model('saved_models/ClearSight.h5', compile=False)
-#     dr_model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-#                     loss='categorical_crossentropy',
-#                     metrics=['accuracy'])
-    
-#     return binary_model, dr_model
-
 def load_models():
     # Download models if they are not present
     download_model(BINARY_MODEL_FILE_ID, BINARY_MODEL_PATH)
@@ -368,24 +352,37 @@ def preprocess_dr(image):
 with st.container():
     st.title("Test Your Diabetic Retinopathy Status")
     st.markdown("---")
-    
-    # Image upload section
-    uploaded_file = st.file_uploader(
-        "Select a retinal scan image",
-        type=["jpg", "jpeg", "png"],
-        accept_multiple_files=False,
-        key="test_uploader"
-    )
 
-    if uploaded_file is not None:
+    st.markdown("#### Or select a sample retinal image for testing:")
+    sample_choice = st.selectbox("Choose a DR stage (0 = No DR, 1 = Mild DR, 2 = Moderate DR, 3 = Severe, 4 = Proliferative)", 
+                                 options=["None", "0", "1", "2", "3", "4"], 
+                                 index=0)
+
+    image = None
+    uploaded_file = None
+
+    if sample_choice != "None":
+        sample_path = f"sample_images/{sample_choice}.png"
         try:
-            # Create centered container
-            col1, col2, col3 = st.columns([5, 5, 6.5])  # Creates 3 columns (left margin, content, right margin)
-            
-            with col2:  # Middle column for centered content
-                image = Image.open(uploaded_file).convert('RGB')
-                
-                # Add custom CSS for centering
+            image = Image.open(sample_path).convert('RGB')
+            st.success(f"Loaded sample image for stage {sample_choice}")
+        except Exception as e:
+            st.error(f"Failed to load sample image: {e}")
+            st.stop()
+    else:
+        uploaded_file = st.file_uploader(
+            "Upload a retinal scan image", 
+            type=["jpg", "jpeg", "png"], 
+            accept_multiple_files=False, 
+            key="test_uploader"
+        )
+        if uploaded_file:
+            image = Image.open(uploaded_file).convert('RGB')
+
+    if image is not None:
+        try:
+            col1, col2, col3 = st.columns([5, 5, 6.5])
+            with col2:
                 st.markdown("""
                 <style>
                     .centered-image {
@@ -398,121 +395,94 @@ with st.container():
                 """, unsafe_allow_html=True)             
 
                 st.markdown('<div class="centered-image">', unsafe_allow_html=True)
-                st.image(image, caption="Uploaded Retinal Scan", width=600)
+                st.image(image, caption="Selected Retinal Scan", width=600)
                 st.markdown('</div>', unsafe_allow_html=True)
-    
-            # First check if it's a retina image
+
+            # Step 1: Retina Validation
             with st.spinner('Verifying retinal scan...'):
                 image_tensor = preprocess_binary(image)
                 with torch.no_grad():
                     output = binary_model(image_tensor)
                     probabilities = torch.nn.functional.softmax(output, dim=1)
                     retina_prob = probabilities[0][1].item()
-                    
+
             if retina_prob < 0.5:
-                st.session_state.show_retry = True  # Set flag for retry button
-                st.error("""
-                ❌ Non-retinal Image Detected  
-                Please upload a valid retinal scan.
-                """)
-
-                if st.session_state.get("show_retry", False):
-
-# Try again styling
-                    st.markdown("""
-                    <style>
-                        .full-width-button-container {
-                            width: 100% !important;
-                            text-align: center !important;
-                            margin-top: 20px !important;
-                        }
-                        .stButton>button {
-                            width: 100% !important;
-                            padding: 15px !important;
-                            font-size: 18px !important;
-                            font-weight: bold !important;
-                            border-radius: 8px !important;
-                            background-color: #ff4b4b !important;
-                            border: 2px solid #cc0000 !important;
-                            color: white !important;
-                            transition: all 0.3s ease-in-out !important;
-                        }
-                        .stButton>button:hover {
-                            background-color: #cc0000 !important;
-                            transform: scale(1.03) !important;
-                        }
-                    </style>
-                    """, unsafe_allow_html=True)
-
-# Try again button
+                st.session_state.show_retry = True
+                st.error("❌ Non-retinal Image Detected. Please upload a valid retinal scan.")
+                
                 if st.button("🔄 Try Again", key="retry_button"):
-                    st.session_state.pop("show_retry", None)  
-                    st.session_state.pop("test_uploader", None) 
-                    st.rerun()  # Refresh the Streamlit app
-            #results section
+                    st.session_state.pop("show_retry", None)
+                    st.session_state.pop("test_uploader", None)
+                    st.rerun()
             else:
                 st.session_state.show_retry = False
                 st.success(f"✅ Valid Retinal Scan Detected (Confidence: {retina_prob*100:.1f}%)")
+
+                # Step 2: DR Detection
                 with st.spinner('Analyzing diabetic retinopathy stage...'):
                     dr_input = preprocess_dr(image)
                     dr_pred = dr_model.predict(dr_input)
                     dr_class = np.argmax(dr_pred)
                     confidence = np.max(dr_pred)
-                
-                 # Store results in session state
+
+                # Save to session
                 st.session_state.diagnosis_data = {
                     'stage': dr_class,
                     'confidence': confidence,
                     'retina_prob': retina_prob,
-                    'image': uploaded_file.getvalue()
+                    'image': image
                 }
 
-                
+                # Display Results
                 dr_stages = {
                     0: ["No Diabetic Retinopathy (Stage 0)", "#4CAF50", "✅"],
                     1: ["Mild Diabetic Retinopathy (Stage 1)", "#FFC107", "⚠️"],
-                    2: ["Moderate Diabetic Retinopathy (Stage 2)", "#FF9800", "⚠️⚠️"], 
+                    2: ["Moderate Diabetic Retinopathy (Stage 2)", "#FF9800", "⚠️⚠️"],
                     3: ["Severe Diabetic Retinopathy (Stage 3)", "#F44336", "❌"],
                     4: ["Proliferative Diabetic Retinopathy (Stage 4)", "#D32F2F", "🆘"]
                 }
-                
+
                 stage, color, emoji = dr_stages[dr_class]
+
                 st.markdown(f"""
-                <div class="severity-box" style="border-left: 5px solid {color};">
+                <div class="severity-box" style="border-left: 5px solid {color}; padding-left: 15px; margin-top: 20px;">
                     <h3>{emoji} Diagnosis: {stage}</h3>
-                    <p>Confidence: {confidence*100:.1f}%</p>
+                    <p><strong>Confidence:</strong> {confidence*100:.1f}%</p>
                 </div>
                 """, unsafe_allow_html=True)
 
-#result analysis button styling
+                # Button Style
                 st.markdown("""
-                    <style>
-                        .full-width-button-container {
-                            width: 100% !important;
-                            text-align: center !important;
-                            margin-top: 20px !important;
-                        }
-                        .stButton>button {
-                            width: 100% !important;
-                            padding: 15px !important;
-                            font-size: 18px !important;
-                            font-weight: bold !important;
-                            border-radius: 8px !important;
-                            background-color: #ff4b4b !important;
-                            border: 2px solid #cc0000 !important;
-                            color: white !important;
-                            transition: all 0.3s ease-in-out !important;
-                        }
-                        .stButton>button:hover {
-                            background-color: #cc0000 !important;
-                            transform: scale(1.03) !important;
-                        }
-                    </style>
-                    """, unsafe_allow_html=True)
+                <style>
+                    .full-width-button-container {
+                        width: 100% !important;
+                        text-align: center !important;
+                        margin-top: 20px !important;
+                    }
+                    .stButton>button {
+                        width: 100% !important;
+                        padding: 15px !important;
+                        font-size: 18px !important;
+                        font-weight: bold !important;
+                        border-radius: 8px !important;
+                        background-color: #ff4b4b !important;
+                        border: 2px solid #cc0000 !important;
+                        color: white !important;
+                        transition: all 0.3s ease-in-out !important;
+                    }
+                    .stButton>button:hover {
+                        background-color: #cc0000 !important;
+                        transform: scale(1.03) !important;
+                    }
+                </style>
+                """, unsafe_allow_html=True)
+
                 st.markdown("---")
-#result analysis button
+
                 if st.button("Results Analysis"):
                     nav_page("results_analysis") 
+
                 st.markdown("---")
+
         except Exception as e:
             st.error(f"Error processing image: {str(e)}")
