@@ -1,5 +1,6 @@
 # 🔍 ClearSight - Data Analysis & Visualization Platform
 
+[![Docker Image](https://img.shields.io/docker/pulls/fraggerr/clearsightai?label=Docker%20Hub)](https://hub.docker.com/r/fraggerr/clearsightai)
 [![Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://clearsight.streamlit.app)
 [![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
