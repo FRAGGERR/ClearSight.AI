@@ -70,7 +70,16 @@
 
 ## 🛠️ Installation
 
-1. **Clone Repository**
+**Clone Repository**
 ```bash
 git clone https://github.com/yourusername/clearsight.git
 cd clearsight
+```
+
+## 🐳 Docker Usage
+
+### Pull the image
+
+```bash
+docker pull fraggerr/clearsightai
+```
