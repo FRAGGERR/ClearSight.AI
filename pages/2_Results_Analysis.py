@@ -14,7 +14,6 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from pathlib import Path
-from streamlit_extras.switch_page_button import switch_page
 
 
 load_dotenv()
