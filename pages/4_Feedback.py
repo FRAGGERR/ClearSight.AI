@@ -14,6 +14,27 @@ if not firebase_admin._apps:
     
 db = firestore.client()
 
+def nav_page(page_name, timeout_secs=1):
+    nav_script = """
+        <script type="text/javascript">
+            function attempt_navigation(page_name) {
+                var links = window.parent.document.getElementsByTagName('a');
+                for (var i = 0; i < links.length; i++) {
+                    if (links[i].href.toLowerCase().includes(page_name.toLowerCase())) {
+                        links[i].click();
+                        return;
+                    }
+                }
+                setTimeout(function() { attempt_navigation(page_name); }, 100);
+            }
+            window.addEventListener("load", function() {
+                attempt_navigation("%s");
+            });
+        </script>
+    """ % page_name
+    # html(nav_script, height=0, width=0)
+    st.components.v1.html(nav_script, height=0, width=0)
+
 def save_feedback(data):
     """Save feedback to Firestore"""
     try:
@@ -195,3 +216,40 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    st.markdown("---")
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.markdown("""
+                <style>
+                    .full-width-button-container {
+                        width: 100% !important;
+                        text-align: center !important;
+                        margin-top: 20px !important;
+                    }
+                    .stButton>button {
+                        width: 100% !important;
+                        padding: 15px !important;
+                        font-size: 18px !important;
+                        font-weight: bold !important;
+                        border-radius: 8px !important;
+                        background-color: #ff4b4b !important;
+                        border: 2px solid #cc0000 !important;
+                        color: white !important;
+                        transition: all 0.3s ease-in-out !important;
+                    }
+                    .stButton>button:hover {
+                        background-color: #cc0000 !important;
+                        transform: scale(1.03) !important;
+                    }
+                </style>
+                """, unsafe_allow_html=True)
+
+    if st.button("About Us"):
+        nav_page("about_us")
+st.markdown("""
+<div style="text-align: center; color: #666; padding: 2rem 0;">
+    <p>ClearSight.AI Diagnostic Report • Not medical advice</p>
+    <p>© 2024 ClearSight Analytics</p>
+</div>
+""", unsafe_allow_html=True)
