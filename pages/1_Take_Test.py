@@ -426,13 +426,21 @@ with st.container():
                     confidence = np.max(dr_pred)
 
                 # Save to session
+
+                if uploaded_file:
+                    image_bytes = uploaded_file.getvalue()
+                else:
+                    from io import BytesIO
+                    img_byte_arr = BytesIO()
+                    image.save(img_byte_arr, format='PNG')
+                    image_bytes = img_byte_arr.getvalue()
+
                 st.session_state.diagnosis_data = {
                     'stage': dr_class,
                     'confidence': confidence,
                     'retina_prob': retina_prob,
-                    'image': image
+                    'image': image_bytes
                 }
-
                 # Display Results
                 dr_stages = {
                     0: ["No Diabetic Retinopathy (Stage 0)", "#4CAF50", "✅"],
