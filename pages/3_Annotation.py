@@ -4,6 +4,27 @@ import numpy as np
 import tempfile
 import os
 
+
+def nav_page(page_name, timeout_secs=1):
+    nav_script = """
+        <script type="text/javascript">
+            function attempt_navigation(page_name) {
+                var links = window.parent.document.getElementsByTagName('a');
+                for (var i = 0; i < links.length; i++) {
+                    if (links[i].href.toLowerCase().includes(page_name.toLowerCase())) {
+                        links[i].click();
+                        return;
+                    }
+                }
+                setTimeout(function() { attempt_navigation(page_name); }, 100);
+            }
+            window.addEventListener("load", function() {
+                attempt_navigation("%s");
+            });
+        </script>
+    """ % page_name
+    # html(nav_script, height=0, width=0)
+    st.components.v1.html(nav_script, height=0, width=0)
 def create_annotation_masks(image_path):
     # Load the fundus image
     img = cv2.imread(image_path)
@@ -164,20 +185,49 @@ def main():
         """, unsafe_allow_html=True)
     
     st.markdown('<div class="header-box">', unsafe_allow_html=True)
-    st.header("📤 Image Upload & Analysis")
-    uploaded_file = st.file_uploader(
-        "Drag and drop or browse fundus images", 
-        type=["jpg", "jpeg", "png"],
-        help="Supported formats: JPG, JPEG, PNG",
-        key="file_uploader"
-    )
+    st.header("📤 Image Upload or Choose Sample")
+
+    input_option = st.radio("Select image input method:", ["Upload Image", "Use Sample Image"], horizontal=True)
+
+    # Get the absolute directory of the current file
+    BASE_DIR = os.path.dirname(__file__)
+    SAMPLE_IMAGES_DIR = os.path.join(BASE_DIR, "..", "sample_images")
+
+    sample_images = {
+        "DR Stage 0 (Normal)": os.path.join(SAMPLE_IMAGES_DIR, "0.png"),
+        "DR Stage 1 (Mild)": os.path.join(SAMPLE_IMAGES_DIR, "1.png"),
+        "DR Stage 2 (Moderate)": os.path.join(SAMPLE_IMAGES_DIR, "2.png"),
+        "DR Stage 3 (Severe)": os.path.join(SAMPLE_IMAGES_DIR, "3.png"),
+        "DR Stage 4 (Proliferative)": os.path.join(SAMPLE_IMAGES_DIR, "4.png"),
+    }
+
+    uploaded_file = None
+    selected_sample_path = None
+    tmp_path = None
+
+    if input_option == "Upload Image":
+        uploaded_file = st.file_uploader(
+            "Drag and drop or browse fundus images", 
+            type=["jpg", "jpeg", "png"],
+            help="Supported formats: JPG, JPEG, PNG",
+            key="file_uploader"
+        )
+    else:
+        sample_choice = st.selectbox("Select a sample retina image:", list(sample_images.keys()))
+        selected_sample_path = sample_images[sample_choice]
+
+
     st.markdown('</div>', unsafe_allow_html=True)
-    
-    if uploaded_file is not None:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_file.name)[1]) as tmp_file:
-            tmp_file.write(uploaded_file.getvalue())
-            tmp_path = tmp_file.name
-        
+
+    # Load the selected or uploaded image
+    if uploaded_file or selected_sample_path:
+        if uploaded_file:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_file.name)[1]) as tmp_file:
+                tmp_file.write(uploaded_file.getvalue())
+                tmp_path = tmp_file.name
+        else:
+            tmp_path = selected_sample_path
+
         try:
             with st.spinner('🔍 Analyzing retinal features...'):
                 masks = create_annotation_masks(tmp_path)
@@ -224,9 +274,49 @@ def main():
             st.warning("Please ensure you've uploaded a valid fundus image in proper lighting conditions.")
         finally:
             try:
-                os.unlink(tmp_path)
+                if uploaded_file:  # Only delete if it was an uploaded file
+                    os.unlink(tmp_path)
             except Exception as cleanup_error:
                 st.warning(f"Warning: Temporary file cleanup failed - {str(cleanup_error)}")
 
+
 if __name__ == "__main__":
     main()
+
+# Footer
+st.markdown("---")
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.markdown("""
+                <style>
+                    .full-width-button-container {
+                        width: 100% !important;
+                        text-align: center !important;
+                        margin-top: 20px !important;
+                    }
+                    .stButton>button {
+                        width: 100% !important;
+                        padding: 15px !important;
+                        font-size: 18px !important;
+                        font-weight: bold !important;
+                        border-radius: 8px !important;
+                        background-color: #ff4b4b !important;
+                        border: 2px solid #cc0000 !important;
+                        color: white !important;
+                        transition: all 0.3s ease-in-out !important;
+                    }
+                    .stButton>button:hover {
+                        background-color: #cc0000 !important;
+                        transform: scale(1.03) !important;
+                    }
+                </style>
+                """, unsafe_allow_html=True)
+
+    if st.button("Feedback"):
+        nav_page("feedback")
+st.markdown("""
+<div style="text-align: center; color: #666; padding: 2rem 0;">
+    <p>ClearSight.AI Retina Vision Analyzer • Not medical advice</p>
+    <p>© 2024 ClearSight Analytics</p>
+</div>
+""", unsafe_allow_html=True)
