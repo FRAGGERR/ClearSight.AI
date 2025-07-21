@@ -494,3 +494,11 @@ with st.container():
 
         except Exception as e:
             st.error(f"Error processing image: {str(e)}")
+
+st.markdown("---")
+st.markdown("""
+<div style="text-align: center; color: #666; padding: 2rem 0;">
+    <p>ClearSight.AI Diagnostic Report • Not medical advice</p>
+    <p>© 2024 ClearSight Analytics</p>
+</div>
+""", unsafe_allow_html=True)
